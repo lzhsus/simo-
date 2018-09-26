@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,
+    maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+		
+        }
+
+        .content-height {
+            height: 600px;
+            border: 1px solid #000;
+            padding: 0;
+            position: relative;
+        }
+
+        .pos {
+            width: 60px;
+            border: 1px solid red;
+            display: block;
+            font-size: 60px;
+            color: red;
+            position: absolute;
+            left: 580px;
+            top: 536px;
+        }
+
+        .ziduan {
+            position: relative;
+            background-color: red;
+        }
+
+        .Bullets {
+            position: absolute;
+            top: -200px;
+            left: 0px;
+            width: 4px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        .smSpan {
+            position: absolute;
+            top: -1px;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #0051aa;
+            display: inline-block;
+            transform: rotate(180deg);
+            font-size: 30px;
+        }
+
+        .dingwi {
+            position: absolute;
+            top: 200px;
+            left: 700px;
+        }
+
+        .smallBullet {
+            width: 2px;
+            height: 6px;
+            border-radius: 3px;
+            background-color: #0f0f0f;
+            position: absolute;
+            top: -3px;
+            left: 14px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 content-height">
+            <div class="ziduan"></div>
+            <span class="icon-icon-fly pos"></span>
+        </div>
+    </div>
+    <button class="btn btn-success dingwi">开始</button>
+
+</div>
+<div></div>
+</body>
+</html>
+<script src="js/jquery-1.12.4.js"></script>
+<script>
+    var fly = document.getElementsByClassName("icon-icon-fly")[0];
+    var conterner = document.getElementsByClassName("content-height")[0];
+    var timer;
+
+    //开始游戏
+
+    document.getElementsByClassName("dingwi")[0].onclick = function () {
+        console.log(1)
+        this.remove()
+        smallFly()
+    }
+
+    //鼠标点击屏幕，获取当前位置的  x y  坐标
+    function zuobiao(e, myS) {
+        var flyLeft = fly.offsetLeft
+        var flyTOp = fly.offsetTop;
+        var bigX = myS.offsetWidth;
+        var bigY = myS.offsetHeight;
+        //点击获取相对于屏幕的  x  y  坐标，赋值给飞机
+        var x = e.clientX - myS.offsetLeft - fly.offsetWidth / 2;
+        var y = e.clientY - myS.offsetTop - fly.offsetHeight / 2;
+        var x = x < 30 ? 0 : x;
+        var y = y < 30 ? 0 : y;
+        var x = x + 62 >= bigX ? bigX - 62 : x;
+        var y = y + 64 >= bigY ? bigY - 64 : y;
+        clickSite(flyLeft, flyTOp, x, y);
+    };
+
+    //计算点击位置
+    function clickSite(flyX, flyY, newX, newY) {
+        var xStep = Math.abs(newX - flyX) / Math.abs(newY - flyY);
+        var yStep = 1;
+        var xLeftRight = newX - flyX;
+        var xTopButton = newY - flyY;
+        var ifF = false;
+        if (xLeftRight > 0) {
+            if (xTopButton > 0) {
+                //右下
+                ifF = true;
+            } else {
+                //右上
+                yStep = -yStep;
+                ifF = false;
+            }
+        } else {
+            if (xTopButton > 0) {
+                //左下
+                xStep = -xStep
+                ifF = true;
+            } else {
+                //左上
+                yStep = -yStep;
+                xStep = -xStep
+                ifF = false;
+            }
+        }
+        //开始移动
+        timer = setInterval(function () {
+            flyX += xStep;
+            flyY += yStep;
+            fly.style.left = flyX + "px";
+            fly.style.top = flyY + "px";
+            console.log(flyY, newY)
+            console.log(ifF);
+            if (ifF) {
+                if (flyY >= newY) {
+                    clearInterval(timer);
+                }
+            } else {
+                if (flyY <= newY) {
+                    clearInterval(timer);
+                }
+            }
+        }, 10);
+    };
+
+    //点击屏幕开始移动
+    conterner.onclick = function (e) {
+        clearInterval(timer);
+        zuobiao(e, this);
+    };
+
+    //自己发射子弹
+    window.onkeydown = function (e) {
+        if (e.keyCode == 32) {
+            var div = document.createElement("div");
+            var ziduan = document.getElementsByClassName("ziduan")[0];
+            div.className = "Bullets";
+            ziduan.append(div);
+            div.style.top = fly.offsetTop + "px";
+            div.style.left = (fly.offsetLeft + 28) + "px";
+        }
+        var timerBullet = setInterval(function () {
+            var bulletTop = div.offsetTop - 2;
+            div.style.top = bulletTop + "px";
+            if (div.offsetTop <= -10) {
+                div.remove();
+                clearInterval(timerBullet);
+            }
+        }, 10)
+    };
+
+    //随机产生小飞机
+    var timerSmallFly;
+
+    function smallFly() {
+        timerSmallFly = setInterval(function () {
+            var smallSpan = document.createElement("span");
+            smallSpan.className = "icon-icon-fly smSpan";
+            var num = parseInt(Math.random() * conterner.offsetWidth)
+            smallSpan.style.left = num + "px";
+            conterner.appendChild(smallSpan);
+            smallFlyMove(conterner.offsetHeight, smallSpan)
+        }, 1000)
+    }
+
+    //小飞机  移动
+    function smallFlyMove(conterHeight, my) {
+        var smallTop = my.offsetTop;
+        var smallTopTerime = setInterval(function () {
+            smallTop += 2;
+            my.style.top = smallTop + "px";
+            if (smallTop + 30 >= conterHeight) {
+                my.remove();
+                clearInterval(smallTopTerime)
+            }
+        }, 30);
+    }
+
+    var smSpan = document.getElementsByClassName("smSpan")
+    var Bullets = document.getElementsByClassName("Bullets")
+
+    function f() {
+        var a = 1;
+        setInterval(function () {
+            for (var i = 0; i < smSpan.length; i++) {
+                var sXTop = smSpan[i].offsetTop;
+                var sXLeft = smSpan[i].offsetLeft
+                for (var j = 0; j < Bullets.length; j++) {
+                    var bXTop = Bullets[j].offsetTop;
+                    var bXLeft = Bullets[j].offsetLeft
+                    if ((bXTop > sXTop || bXTop > (sXTop + 30)) && (bXLeft > sXLeft || bXLeft < (sXLeft + 30))) {
+                        smSpan[i].remove()
+                        Bullets[j].remove()
+                    }
+                }
+            }
+
+            a++;
+        }, 1000)
+    }
+
+    f()
+    //小飞机发射子弹
+    // function smallFlyBullet(my, conterHeight) {
+    //     var smallFlyBulletNum = setInterval(function () {
+    //         var smallDivBullet = document.createElement("div")
+    //         smallDivBullet.className = "smallBullet";
+    //         my.append(smallDivBullet);
+    //     }, 30)
+    //     var smallFlyBulletMove = setInterval(function () {
+    //         var sdBosT = smallDivBullet.offsetTop
+    //         sdBosT -= 1;
+    //         smallDivBullet.style.top = sdBosT + "px";
+    //         if (sdBosT >= conterHeight) {
+    //             smallDivBullet.remove()
+    //             clearInterval(smallFlyBulletMove)
+    //         }
+    //     }, 20)
+    // }
+</script>
