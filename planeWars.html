@@ -70,13 +70,13 @@
 				var centerw=(Math.random()*($body-mW));
 				var bigw=(Math.random()*($body-bW));
 				if(controller%50==0){
-					enemys.push(new Enemy("images/a.png","images/a.jpg",smallw,0))
+					enemys.push(new Enemy("images/a.png","images/a.jpg",smallw,-sW,10))
 				}
 				if(controller%100==0){
-					enemys.push(new Enemy("images/b.png","images/b.jpg",centerw,0))
+					enemys.push(new Enemy("images/b.png","images/b.jpg",centerw,-mW,20))
 				}
 				if(controller%150==0){
-					enemys.push(new Enemy("images/c.png","images/c.jpg",bigw,0))
+					enemys.push(new Enemy("images/c.png","images/c.jpg",bigw,-bW,40))
 				}
 				for (var i = 0; i < enemys.length; i++) {
 					enemys[i].moveEnemy()
@@ -86,6 +86,12 @@
 						enemys[i].$Enemy.remove();
 						// 移出飞机对象
 						enemys.splice(i,1)
+					}
+			
+				
+					
+					if(enemys[i].$Enemy.myPH<=0){
+						
 					}
 				}
 				controller++;
@@ -112,14 +118,15 @@
 		}
 
 		// 构造敌方飞机对象
-		function Enemy(src,bsrc,w,h){
+		function Enemy(src,bsrc,w,h,myPH){
 			// 定义敌方的初始位置
-			this.$Enemy=$("<img src='"+src+"'/>")
+			this.$Enemy=$("<img src='"+src+"' _src='"+bsrc+"'/>" )
 			this.$Enemy.css({
 				"position":"absolute",
 				"left":w,
 				"top":h
 			})
+			this.$Enemy.myPH=myPH;
 			$('.game').append(this.$Enemy)
 			this.moveEnemy=function(){
 				this.$Enemy.css('top',this.$Enemy.offset().top+6)
