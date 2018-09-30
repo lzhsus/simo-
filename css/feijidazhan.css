@@ -1,4 +1,4 @@
-* {
+﻿* {
     margin: 0;
     padding: 0;
 }
@@ -27,6 +27,7 @@ body {
 }
 /*开始游戏界面*/
 .game{
+	overflow: hidden;
 	background-image: url(../images/bg.png);
 	display: none;
 	background-size: 100% 100%;
