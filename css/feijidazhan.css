@@ -1,0 +1,57 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+
+/*初始化,游戏界面*/
+
+.init,
+.game {
+    height: 100%;
+    position: relative;
+}
+
+
+/*初始化背景*/
+
+.init {
+    background-image: url(../images/init.png);
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+}
+/*开始游戏界面*/
+.game{
+	background-image: url(../images/bg.png);
+	display: none;
+	background-size: 100% 100%;
+}
+/*初始化 开始按钮*/
+.init>.start{
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	bottom: 30%;
+	width: 40%;
+	font-size: 22px;
+	padding: 8px;
+	text-align: center;
+	border: 1px solid #333333;
+	border-radius: 23px;
+}
+/*玩家飞机*/
+.plane{
+
+	position: absolute;
+	bottom: 0;
+/*	left: 50%;
+	transform: translateX(-50%);*/
+}
+.plane img{
+		border: 1px solid red;
+}

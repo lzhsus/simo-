@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Document</title>
+	<link rel="stylesheet" href="css/feijidazhan.css">
+</head>
+<body>
+	<div class="init">
+		<span class="start">开始游戏</span>
+	</div>
+	<div class="game">
+		<div class="plane"><img src="images/p.png" alt=""></div>
+	</div>
+</body>
+</html>
+<script type="text/javascript" src="lib/zepto.min.js"></script>
+<script type="text/javascript" src="lib/touch.js"></script>
+<script>
+	$(function(){
+		// 定义相关阐述
+		var $body=$('body').width()
+		var $height=$('body').height()
+		var $gameBgTop=0;
+		// 玩家飞机
+		var $myPw=66;
+		var $myPh=80;
+		// 玩家子弹
+		var $myBw=6;
+		var $myBh=14;
+		// 定义子弹数组
+		var bullets=[];
+		var enemys=[]
+		var sW=43;
+		var mW=46;
+		var bW=110;
+		var smallH=24;
+		var controller=0;
+		// 开始按钮 关闭初始化  开始游戏
+		$(".start").on("click",function(){
+			// 初始化飞机left 居中
+			$('.plane').css('left',($body-$myPw)/2)
+			$(".init").hide()
+			$(".game").show() //开始游戏
+			// move() //背景开始移动
+			// // 背景图片无限滚动
+			setInterval(function(){
+				var $h=$('.game').css('backgroundPosition','0 '+$gameBgTop+'px')
+				$gameBgTop=($gameBgTop>$height)?0:$gameBgTop+0.5;
+				// console.log($gameBgTop)
+				//生成子弹对象 添加到数组
+				var $mypLeft=$('.plane').offset().left+($myPw+$myBw)/2
+				var $mypTop =$('.plane').offset().top
+	
+				bullets.push(new Bullet($mypLeft,$mypTop))
+				// all 子弹开始移动
+				for (var i = 0; i < bullets.length; i++) {
+					bullets[i].moveBullet()
+					// console.log(bullets[i])
+					if(bullets[i].$bullet.offset().top<=0-$myBh){
+						// 移出飞机图片
+						bullets[i].$bullet.remove();
+						// 移出飞机对象
+						bullets.splice(i,1)
+					}
+				}
+			
+				var smallw=(Math.random()*($body-sW));
+				var centerw=(Math.random()*($body-mW));
+				var bigw=(Math.random()*($body-bW));
+				if(controller%50==0){
+					enemys.push(new Enemy("images/a.png","images/a.jpg",smallw,0))
+				}
+				if(controller%100==0){
+					enemys.push(new Enemy("images/b.png","images/b.jpg",centerw,0))
+				}
+				if(controller%150==0){
+					enemys.push(new Enemy("images/c.png","images/c.jpg",smallw,0))
+				}
+				for (var i = 0; i < enemys.length; i++) {
+					enemys[i].moveEnemy()
+				
+					if(enemys[i].$Enemy.offset().top>=$height){
+						// 移出飞机图片
+						enemys[i].$Enemy.remove();
+						// 移出飞机对象
+						enemys.splice(i,1)
+					}
+						controller++;
+				}
+			},30)
+		})
+		// 构造子弹对象
+		// $mypLeft 飞机的left
+		// $mypTop  飞机的top
+		
+		function Bullet(mypLeft,mypTop){
+			 this.$bullet=$("<img src='images/bullet.png'>");
+			// 构造子弹初始位置
+			this.$bullet.css({
+				"position":"absolute",
+				"left":mypLeft,
+				"top":mypTop
+			});
+			
+			$('.game').append(this.$bullet);
+			// 定义子弹移动 方法
+			this.moveBullet=function(){
+				this.$bullet.css('top',this.$bullet.offset().top-30)
+			}
+		}
+
+		// 构造敌方飞机对象
+		function Enemy(src,bsrc,w,h){
+			// 定义敌方的初始位置
+			this.$Enemy=$("<img src='"+src+"'/>")
+			this.$Enemy.css({
+				"position":"absolute",
+				"left":w,
+				"top":h
+			})
+			$('.game').append(this.$Enemy)
+			this.moveEnemy=function(){
+				this.$Enemy.css('top',this.$Enemy.offset().top+6)
+			}
+		}
+		// 游戏结束 背景停止
+		function endMove(){
+			// clearInterval(timeStartMove)
+		}
+		// 玩家飞机 移动
+		function myPlane($this,e){
+			var $myPLeft=$this.offset().left;
+			var $myPTop=$this.offset().top;
+	
+			var $cX=e.targetTouches[0].pageX-$myPLeft; //触点 与 x的 差值
+			var $cY=e.targetTouches[0].pageY-$myPTop; //触点 与 y的 差值
+		
+			$this.css({
+					left:e.targetTouches[0].pageX-$myPw/2,
+					top:e.targetTouches[0].pageY-$myPh/2
+				})
+		
+			$this.on('touchmove',function(e){
+				// 计算飞机的坐标
+				$myPLeft=e.targetTouches[0].pageX-$myPw/2;
+				$myPTop=e.targetTouches[0].pageY-$myPh/2;
+				// 边界检测
+				$myPLeft=($myPLeft<=0)?0:$myPLeft;
+				$myPLeft=($myPLeft>=($body-$myPw)?($body-$myPw):$myPLeft)
+				$myPTop=($myPTop<=0)?0:$myPTop;
+
+				$myPTop=($myPTop>=($height-$myPh)?($height-$myPh):$myPTop)
+				$this.css({
+					left:$myPLeft,
+					top:$myPTop
+				})
+			})
+		}
+		// 点击飞机开始移动
+		$('.plane').on('touchstart',function(e){
+			myPlane($(this),e)
+		})
+		
+	})
+</script>
